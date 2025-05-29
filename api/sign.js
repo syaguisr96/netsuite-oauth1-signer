@@ -1,9 +1,9 @@
+import crypto from 'crypto';
+
 export default function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
-
-  const crypto = require('crypto');
 
   const {
     url,
@@ -32,7 +32,7 @@ export default function handler(req, res) {
 
   const paramString = Object.entries(oauthParams)
     .sort()
-    .map(([k, v]) => \`\${encodeURIComponent(k)}=\${encodeURIComponent(v)}\`)
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
     .join('&');
 
   const baseString = [
@@ -41,18 +41,19 @@ export default function handler(req, res) {
     encodeURIComponent(paramString)
   ].join('&');
 
-  const signingKey = \`\${encodeURIComponent(consumerSecret)}&\${encodeURIComponent(tokenSecret)}\`;
+  const signingKey = `${encodeURIComponent(consumerSecret)}&${encodeURIComponent(tokenSecret)}`;
 
   const signature = crypto
     .createHmac('sha256', signingKey)
     .update(baseString)
     .digest('base64');
 
-  const header = \`OAuth realm="\${realm}", \` +
+  const authHeader =
+    `OAuth realm="${realm}", ` +
     Object.entries(oauthParams)
-      .map(([k, v]) => \`\${encodeURIComponent(k)}="\${encodeURIComponent(v)}"\`)
+      .map(([k, v]) => `${encodeURIComponent(k)}="${encodeURIComponent(v)}"`)
       .join(', ') +
-    \`, oauth_signature="\${encodeURIComponent(signature)}"\`;
+    `, oauth_signature="${encodeURIComponent(signature)}"`;
 
-  res.status(200).json({ authorizationHeader: header });
+  res.status(200).json({ authorizationHeader: authHeader });
 }
