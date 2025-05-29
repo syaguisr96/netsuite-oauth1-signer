@@ -1,0 +1,10 @@
+{
+  "name": "netsuite-oauth-signer",
+  "version": "1.0.0",
+  "description": "OAuth 1.0a signer for NetSuite",
+  "main": "api/sign.js",
+  "type": "module",
+  "dependencies": {
+    "crypto": "^1.0.1"
+  }
+}
